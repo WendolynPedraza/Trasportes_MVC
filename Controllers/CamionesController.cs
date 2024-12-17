@@ -21,7 +21,7 @@ namespace Trasportes_MVC.Controllers
             //Crear la lista de camiones del modelo original
             List<Camiones> lista_camiones = new List<Camiones>();
             //lleno la lista con elelemntos existentes dentro dle contexto (BD) ustoilizando EF y LinQ
-            using (TransportesEntities context =new TransportesEntities())
+            using (TransportesEntities context = new TransportesEntities())
             {
                 //lleno mi loista directamente usando LinQ
                 //consulta directa
@@ -31,7 +31,7 @@ namespace Trasportes_MVC.Controllers
                 //otra forma de hacerlo
                 //foreach(Camiones cam in context.Camiones)
                 //{
-                  //  lista_camiones.Add(cam);
+                //  lista_camiones.Add(cam);
                 //}
             }
             //ViewBang (forma parte de razor) se caracteriza por hacer uso de una propiedad arbitraria que sirve para pasar informacion desde el controlador a la vista 
@@ -77,11 +77,11 @@ namespace Trasportes_MVC.Controllers
                         camion.Kilometraje = model.Kilometraje;
                         camion.Disponibilidad = model.Disponibilidad;
                         //validamos si existe una imagen en la peticion 
-                        if (imagen != null && imagen.ContentLength>0)
+                        if (imagen != null && imagen.ContentLength > 0)
                         {
                             string filename = Path.GetFileName(imagen.FileName);//recupero el nombre la imagen que viene de la peticion
                             string pathdir = Server.MapPath("~/Assets/Imagenes/Camiones/");//mapeo la ruta donde guardare mi imagen en el servidor
-                            if(!Directory.Exists(pathdir))//sino existe el directorio, lo creo{
+                            if (!Directory.Exists(pathdir))//sino existe el directorio, lo creo{
                             {
                                 Directory.CreateDirectory(pathdir);
                             }
@@ -99,14 +99,15 @@ namespace Trasportes_MVC.Controllers
                             cargarDDL();
                             return View(model);
                         }
-                    } 
+                    }
                 }
                 else
                 {
                     cargarDDL();
                     return View(model);
                 }
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 //en caso de que ocurra una exepcion, voy a mostrar un msj con el error(SweetAlert), voy a devolver la vista del modeo que causo elmconflicto (return View(model)) y vuelvona cargar el DDL que esten disponibles esas opciones 
                 cargarDDL();
@@ -117,10 +118,10 @@ namespace Trasportes_MVC.Controllers
         //GET: Editar_camion/{id}
         public ActionResult Editar_Camion(int id)
         {
-            if(id>0)
+            if (id > 0)
             {
                 Camiones_DTO camion = new Camiones_DTO(); //creo una instancia del tipo DTO para pasar informacion desde el contexto a la vista en ayuda de EF y LinQ
-                using (TransportesEntities context = new TransportesEntities()) 
+                using (TransportesEntities context = new TransportesEntities())
                 {
                     //busco a aquel elemento que coincida con el ID
                     //Bajo metodo
@@ -140,20 +141,22 @@ namespace Trasportes_MVC.Controllers
 
                     //bajo una consulta (usando LinQ)
                     //cuando hago una consulta directa , tengo la oportunodad de asignar valores a tipo de datos mas complejos o diferentes, incluso, pudiendo crear nuevos datos a partir de dtos existentes 
-                    camion = (from c in context.Camiones where c.ID_Camion == id select new Camiones_DTO()
-                    {
-                        ID_Camion = c.ID_Camion,
-                        Matricula=c.Matricula,
-                        Marca = c.Marca,
-                        Modelo = c.Modelo,
-                        Capacidad = c.Capacidad,
-                        Kilometraje=c.Kilometraje,
-                        Tipo_Camion=c.Tipo_Camion,
-                        Disponibilidad=c.Disponibilidad,
-                        UrlFoto=c.UrlFoto
-                    }).FirstOrDefault();
+                    camion = (from c in context.Camiones
+                              where c.ID_Camion == id
+                              select new Camiones_DTO()
+                              {
+                                  ID_Camion = c.ID_Camion,
+                                  Matricula = c.Matricula,
+                                  Marca = c.Marca,
+                                  Modelo = c.Modelo,
+                                  Capacidad = c.Capacidad,
+                                  Kilometraje = c.Kilometraje,
+                                  Tipo_Camion = c.Tipo_Camion,
+                                  Disponibilidad = c.Disponibilidad,
+                                  UrlFoto = c.UrlFoto
+                              }).FirstOrDefault();
                 }//cierre el Using(context)
-                if(camion==null)//valido si realmente recupere los datos de la base de dtos {
+                if (camion == null)//valido si realmente recupere los datos de la base de dtos {
                 {
                     return RedirectToAction("Index");
                 }
@@ -291,6 +294,50 @@ namespace Trasportes_MVC.Controllers
             }
         }
 
+        //GET: Eliminar_Camion /{id}
+        public ActionResult Eliminar_Camion(int id)
+        {
+            try
+            {
+                using (TransportesEntities context = new TransportesEntities())
+                {
+                    //recuperar el camion que deseo eliminar 
+                    var camion = context.Camiones.FirstOrDefault(x => x.ID_Camion == id);
+                    //validamos sis existe dicho valor 
+                    if (camion == null)
+                    {
+                        //me voy pa tras
+                        //swet
+                        SweetAlert("No encontrado", $"No hemos encntrado el camion con identificador: {id}", NotificationType.info);
+                        return RedirectToAction("Index");
+                    }
+
+                    //procedo a eliminar 
+                    context.Camiones.Remove(camion);
+                    context.SaveChanges();
+                    //sweetAlert
+
+                    SweetAlert("Elominar", "camion eloiminado con exito", NotificationType.success);
+
+                    return RedirectToAction("Index");
+                }
+            }
+            catch (Exception ex)
+            {
+                //sweetAlert
+                SweetAlert("Opsss..", $"Ha ocurrido un error: {ex.Message}", NotificationType.error);
+
+                return RedirectToAction("Index");
+            }
+        }
+
+        //Get: confimar eliminar 
+        public ActionResult Confirmar_Eliminar(int id)
+        {
+            SweetAlert_Eliminar(id);
+            return RedirectToAction("Index");
+        }
+
         #region Auxilires
         private class Opciones
         {
@@ -310,5 +357,54 @@ namespace Trasportes_MVC.Controllers
             ViewBag.ListaTipos = lista_opciones;
         }
         #endregion
+
+        #region SweetAlert
+        //Declaraion de un HTMLHelperpersonalizado: Digase de aquel metodo auxiliar que me permite construir codigo HTML/JS en tiempo seal basado en las acciones del Razor/Controller
+        private void SweetAlert(string title, string msg, NotificationType type)
+        {
+            var script = "<script languaje='javascript'> " +
+                         "Swal.fire({" +
+                         "title: '" + title + "'," +
+                         "text: '" + msg + "'," +
+                         "icon: '" + type + "'" +
+                         "});" +
+                         "</script>";
+            //tempData funcion como ViewbAG, PASANDO INFORMACION DEL CONTROLADOR A CUALQUIER PARATE DE MI PROYECTO, SIENDO ESTE, MAS OBSERVABLE Y CON UN TI´PO DE VIDA MAYOR
+            TempData["sweetalert"] = script;
+
+        }
+
+        private void SweetAlert_Eliminar(int id)
+        {
+            var script = "<script languaje='javascript'>" +
+                "Swal.fire({" +
+                "title: '¿Estás Seguro?'," +
+                "text: 'Estás apunto de Eliminar el Camión: " + id.ToString() + "'," +
+                "icon: 'info'," +
+                "showDenyButton: true," +
+                "showCancelButton: true," +
+                "confirmButtonText: 'Eliminar'," +
+                "denyButtonText: 'Cancelar'" +
+                "}).then((result) => {" +
+                "if (result.isConfirmed) {  " +
+                "window.location.href = '/Camiones/Eliminar_Camion/" + id + "';" +
+                "} else if (result.isDenied) {  " +
+                "Swal.fire('Se ha cancelado la operación','','info');" +
+                "}" +
+                "});" +
+                "</script>";
+
+            TempData["sweetalert"] = script;
+        }
+
+        public enum NotificationType
+        {
+            error,
+            success,
+            warning,
+            info,
+            question
+            #endregion
+        }
     }
 }

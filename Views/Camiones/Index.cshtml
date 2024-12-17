@@ -48,23 +48,25 @@
 <div class="col-md-12  row text-center">
     @foreach (var camion in Model)
     {
-        @*//Tarjeta de Bootstrap*@
-        <div class="card" style="width: 18rem;">
-            <img src="@camion.UrlFoto" class="card-img-top" alt="@camion.UrlFoto">
-            <div class="card-body">
-                <h2 class="card-title">Camion no. @camion.ID_Camion</h2>
-                <h5 class="card-title">@camion.Matricula</h5>
-                <ul>
-                    <li class="card-text">@camion.Capacidad</li>
-                    <li class="card-text">@camion.Tipo_Camion</li>
-                    <li class="card-text">@camion.Marca</li>
-                    <li class="card-text">@camion.Modelo</li>
-                    <li class="card-text">@camion.Kilometraje</li>
-                    <li class="card-text">@camion.Disponibilidad</li>
-                </ul>
-                <a class="btn btn-warning" href="~/Camiones/Editar_Camion/@camion.ID_Camion">Editar</a>
-                <a class="btn btn-danger" href="~/Camiones/Confirmar-Eliminar/@camion.ID_Camion">Eliminar</a>
+        <div class="col-md-3 col-sm-12">
+            @*//Tarjeta de Bootstrap*@
+            <div class="card" style="width: 18rem;">
+                <img src="@camion.UrlFoto" class="card-img-top" alt="@camion.UrlFoto">
+                <div class="card-body">
+                    <h2 class="card-title">Camion no. @camion.ID_Camion</h2>
+                    <h5 class="card-title">@camion.Matricula</h5>
+                    <ul>
+                        <li class="card-text">@camion.Capacidad</li>
+                        <li class="card-text">@camion.Tipo_Camion</li>
+                        <li class="card-text">@camion.Marca</li>
+                        <li class="card-text">@camion.Modelo</li>
+                        <li class="card-text">@camion.Kilometraje</li>
+                        <li class="card-text">@camion.Disponibilidad</li>
+                    </ul>
+                    <a class="btn btn-warning" href="~/Camiones/Editar_Camion/@camion.ID_Camion">Editar</a>
+                    <a class="btn btn-danger" href="~/Camiones/Confirmar_Eliminar/@camion.ID_Camion">Eliminar</a>
+                </div>
             </div>
         </div>
     }
-    </div>
+</div>
